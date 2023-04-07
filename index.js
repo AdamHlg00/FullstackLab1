@@ -1,15 +1,16 @@
 const express = require('express')
 const app = express()
-const port = 3000
+
+require('dotenv').config()
+
+const port = process.env.PORT
 
 // Imports album model
 const AlbumModel = require('./models/albumModel')
 
-const password = 'ixR3RN7ZL2b9nlN7'
-
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
-const mongoDB = `mongodb+srv://user:${password}@fullstacklab1.qrmbdib.mongodb.net/?retryWrites=true&w=majority`
+const mongoDB = process.env.ACCESS_STRING
 
 main().catch(err => console.log(err))
 async function main() {
