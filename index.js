@@ -1,9 +1,13 @@
 const express = require('express')
 const app = express()
+const path = require('path')
 
 require('dotenv').config()
 
 const port = process.env.PORT
+
+app.set('view engine', 'ejs')
+app.use(express.json())
 
 // Imports album model
 const AlbumModel = require('./models/albumModel')
@@ -27,6 +31,6 @@ app.listen(port, () => {
 })
 
 app.get('/', async function (req, res) {
-  console.log(await AlbumModel.find())
-  res.json('The server is up!')
+  let allAlbums = await AlbumModel.find()
+  res.render('index.ejs', { albums: allAlbums })
 })
