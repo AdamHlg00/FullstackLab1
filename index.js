@@ -56,7 +56,7 @@ app.get('/api/albums/:title', async function (req, res) {
     console.log(album)
     res.send(album)
   } else {
-    res.status(404).send('Album not found')
+    res.status(404).json('Album not found')
   }
 })
 
@@ -71,11 +71,16 @@ app.post('/api/albums', async function (req, res) {
   let album = await AlbumModel.findById(id)
 
   // If the id is occupied, send error
-  if (album = '') {
+  if (album === null) {
     // Finds album by title, artist, and year
-    album = await AlbumModel.find({ title: `${title}` }, { artist: `${artist}` }, { year: `${year}` })
+    album = await AlbumModel.find({
+      title: `${title}`,
+      artist: `${artist}`,
+      year: `${year}`
+    })
+
     // If the album already exist, send error
-    if (album = '') {
+    if (album.length === 0) {
       const newAlbum = new AlbumModel({
         _id: `${id}`,
         title: `${title}`,
@@ -84,18 +89,18 @@ app.post('/api/albums', async function (req, res) {
       })
 
       // Adds new album to the database
-      newAlbum.save((err, res) => {
-        if (err) {
-          res.status(500).send('Error!')
-        } else {
-          res.status(201).send(newAlbum)
-        }
-      })
+      await newAlbum.save()
+        .then((savedAlbum) => {
+          res.status(201).send(savedAlbum)
+        })
+        .catch((err) => {
+          res.status(500).json('Error!')
+        })
     } else {
-      res.status(409).send('Album already exist in database!')
+      res.status(409).json('Album already exist in database!')
     }
   } else {
-    res.status(409).send('Id already exist!')
+    res.status(409).json('Id already exist!')
   }
 })
 
