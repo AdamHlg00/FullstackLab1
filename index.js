@@ -107,16 +107,39 @@ app.post('/api/albums', async function (req, res) {
 // Route for updating an album
 app.put('/api/albums/:id', async function (req, res) {
   let id = req.body.id
+  let title = req.body.title
+  let artist = req.body.artist
+  let year = req.body.year
+
+  AlbumModel.findByIdAndUpdate(ObjectId(id), {
+    title: `${title}`,
+    artist: `${artist}`,
+    year: `${year}`
+  })
+    .then((updatedAlbum) => {
+      if (!updatedAlbum) {
+        res.status(404).json('Album not found!')
+      } else {
+        res.status(200).send(updatedAlbum)
+      }
+    })
+    .catch((err) => {
+      res.status(500).json('Error when updating album!')
+    })
 })
 
+// Route for deleting an album
 app.delete('/api/albums/:id', async function (req, res) {
   let id = req.body.id
   AlbumModel.findByIdAndDelete(id)
     .then((deletedAlbum) => {
-      res.status(200).send(deletedAlbum)
+      if (!deletedAlbum) {
+        res.status(404).send('Album not found!')
+      } else {
+        res.status(200).send(deletedAlbum)
+      }
     })
     .catch((err) => {
-      console.error(err)
-      res.status(404).json('Error!')
+      res.status(500).json('Error when deleting album!')
     })
 })

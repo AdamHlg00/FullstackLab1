@@ -57,37 +57,67 @@ async function displayAlbums() {
     let deleteButtonCell = document.createElement('td')
     let deleteButton = document.createElement('button')
     deleteButton.textContent = 'Delete'
+
+    // Event handler for delete button
     deleteButton.addEventListener('click', async () => {
-      const albumId = {
-        id: album._id
-      }
+      // Removes delete button so it can be replaced by confirm/cancel
+      deleteButtonCell.removeChild(deleteButton)
 
-      const albumIdJSON = JSON.stringify(albumId)
-      let idData = await deleteAlbum(albumIdJSON)
+      let confirmDeleteButton = document.createElement('button')
+      confirmDeleteButton.textContent = 'Confirm'
 
-      document.getElementById('albumInfo').innerHTML = idData.title + ' deleted! Page reload commencing..'
-      setTimeout(() => { location.reload() }, 2000)
+      // Adds confirmation button to the cell
+      deleteButtonCell.appendChild(confirmDeleteButton)
+
+      // Event handler for confirming deletion
+      confirmDeleteButton.addEventListener('click', async () => {
+        const albumId = {
+          id: album._id
+        }
+
+        const albumIdJSON = JSON.stringify(albumId)
+        let idData = await deleteAlbum(albumIdJSON)
+
+        document.getElementById('albumInfo').innerHTML = idData.title + ' deleted! Page reload commencing..'
+        setTimeout(() => { location.reload() }, 2000)
+      })
+
+      let cancelDeleteButton = document.createElement('button')
+      cancelDeleteButton.textContent = 'Cancel'
+
+      // Adds cancelation button to the cell
+      deleteButtonCell.appendChild(cancelDeleteButton)
+
+      // Event handler for canceling deletion
+      cancelDeleteButton.addEventListener('click', async () => {
+        // Replaces confirm/cancel with the original delete button
+        deleteButtonCell.removeChild(confirmDeleteButton)
+        deleteButtonCell.removeChild(cancelDeleteButton)
+        deleteButtonCell.appendChild(deleteButton)
+      })
     })
+
     deleteButtonCell.appendChild(deleteButton)
     row.appendChild(deleteButtonCell)
 
-    // Cell for edit button
-    let editButtonCell = document.createElement('td')
-    let editButton = document.createElement('button')
-    editButton.textContent = 'Edit'
-    editButton.addEventListener('click', async () => {
-      const albumId = {
+    // Cell for update button
+    let updateButtonCell = document.createElement('td')
+    let updateButton = document.createElement('button')
+    updateButton.textContent = 'Update'
+    updateButton.addEventListener('click', async () => {
+      const albumData = {
         id: album._id
       }
 
-      const albumIdJSON = JSON.stringify(albumId)
-      let idData = await deleteAlbum(albumIdJSON)
+      const albumDataJSON = JSON.stringify(albumData)
+      let data = await deleteAlbum(albumDataJSON)
 
-      document.getElementById('albumInfo').innerHTML = idData.title + ' edited! Page reload commencing..'
+      document.getElementById('albumInfo').innerHTML = data.title + ' updated! Page reload commencing..'
       setTimeout(() => { location.reload() }, 2000)
     })
-    editButtonCell.appendChild(editButton)
-    row.appendChild(editButtonCell)
+
+    updateButtonCell.appendChild(updateButton)
+    row.appendChild(updateButtonCell)
 
     // Appends the row to the table
     tableBody.appendChild(row)
