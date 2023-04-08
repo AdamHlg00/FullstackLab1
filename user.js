@@ -16,7 +16,7 @@ addButton.addEventListener('click', async event => {
   if (data === 'Id already exist!' || data === 'Album already exist in database!') {
     return
   } else {
-    document.getElementById('addedAlbum').innerHTML = data.title + ' added! Page reload commencing..'
+    document.getElementById('albumInfo').innerHTML = data.title + ' added! Page reload commencing..'
 
     setTimeout(() => { location.reload() }, 2000)
   }
@@ -53,13 +53,65 @@ async function displayAlbums() {
     yearCell.textContent = album.year
     row.appendChild(yearCell)
 
+    // Cell for delete button
+    let deleteButtonCell = document.createElement('td')
+    let deleteButton = document.createElement('button')
+    deleteButton.textContent = 'Delete'
+    deleteButton.addEventListener('click', async () => {
+      const albumId = {
+        id: album._id
+      }
+
+      const albumIdJSON = JSON.stringify(albumId)
+      let idData = await deleteAlbum(albumIdJSON)
+
+      document.getElementById('albumInfo').innerHTML = idData.title + ' deleted! Page reload commencing..'
+      setTimeout(() => { location.reload() }, 2000)
+    })
+    deleteButtonCell.appendChild(deleteButton)
+    row.appendChild(deleteButtonCell)
+
+    // Cell for edit button
+    let editButtonCell = document.createElement('td')
+    let editButton = document.createElement('button')
+    editButton.textContent = 'Edit'
+    editButton.addEventListener('click', async () => {
+      const albumId = {
+        id: album._id
+      }
+
+      const albumIdJSON = JSON.stringify(albumId)
+      let idData = await deleteAlbum(albumIdJSON)
+
+      document.getElementById('albumInfo').innerHTML = idData.title + ' edited! Page reload commencing..'
+      setTimeout(() => { location.reload() }, 2000)
+    })
+    editButtonCell.appendChild(editButton)
+    row.appendChild(editButtonCell)
+
+    // Appends the row to the table
     tableBody.appendChild(row)
   })
 }
 
 window.addEventListener('load', displayAlbums)
 
-// Gets all albums from the API using fetch
+// Fetch for deleting an album
+async function deleteAlbum(albumData) {
+  try {
+    let result = await fetch('http://localhost:3000/api/albums/:id', {
+      method: 'DELETE',
+      headers: { 'content-type': 'application/json' },
+      body: albumData
+    })
+    let rest = await result.json()
+    return rest
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// Fetch for getting all albums
 async function getAlbums() {
   try {
     let result = await fetch('http://localhost:3000/api/albums', {
@@ -73,6 +125,7 @@ async function getAlbums() {
   }
 }
 
+// Fetch for adding an album
 async function addAlbum(albumData) {
   try {
     let result = await fetch('http://localhost:3000/api/albums', {

@@ -108,3 +108,15 @@ app.post('/api/albums', async function (req, res) {
 app.put('/api/albums/:id', async function (req, res) {
   let id = req.body.id
 })
+
+app.delete('/api/albums/:id', async function (req, res) {
+  let id = req.body.id
+  AlbumModel.findByIdAndDelete(id)
+    .then((deletedAlbum) => {
+      res.status(200).send(deletedAlbum)
+    })
+    .catch((err) => {
+      console.error(err)
+      res.status(404).json('Error!')
+    })
+})
