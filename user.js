@@ -1,7 +1,7 @@
 let getAlbumsButton = document.getElementById('getAlbumsButton')
 
 // Takes care of displaying all albums
-getAlbumsButton.addEventListener('click', async event => {
+async function displayAlbums() {
   let data = await getAlbums()
   console.log(data)
 
@@ -34,7 +34,9 @@ getAlbumsButton.addEventListener('click', async event => {
 
     tableBody.appendChild(row)
   })
-})
+}
+
+window.addEventListener('load', displayAlbums)
 
 // Gets all albums from the API using fetch
 async function getAlbums() {
