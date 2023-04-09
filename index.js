@@ -47,9 +47,11 @@ app.get('/api/albums', async function (req, res) {
 
 // Route for getting and displaying a specific album
 app.get('/api/albums/:title', async function (req, res) {
+  console.log('It call')
   let title = req.params.title
   // Gets an album using title
   let album = await AlbumModel.find({ title: `${title}` })
+  console.log(album)
 
   // If album title isn't found, send error status
   if (album != '') {
@@ -109,28 +111,20 @@ app.put('/api/albums/:id', async function (req, res) {
   let updateFields = {}
 
   let id = req.body.id
-  /*let title
-  let artist
-  let year
-  console.log(id)*/
 
+  // Values of a document will only be changed if a new value was entered when updating
+  // If no new value was entered, that value will remain empty here and be ignored when updating
   if (req.body.title) {
     updateFields.title = req.body.title
-    console.log('Title is title')
   }
-  console.log(updateFields.title)
 
   if (req.body.artist) {
     updateFields.artist = req.body.artist
-    console.log('Artist is artist')
   }
-  //console.log(updateFields.artist)
 
   if (req.body.year) {
     updateFields.year = req.body.year
-    console.log('Year is year')
   }
-  //console.log(updateFields.year)
 
   // Finds the album by id and tries to update it
   AlbumModel.findByIdAndUpdate(id, updateFields, { new: true })

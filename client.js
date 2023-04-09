@@ -1,29 +1,9 @@
 const getAlbumsButton = document.getElementById('getAlbumsButton')
 const addButton = document.getElementById('addButton')
 
-// Event listener for the add button
-addButton.addEventListener('click', async event => {
-  const albumData = {
-    id: addId.value,
-    title: addTitle.value,
-    artist: addArtist.value,
-    year: addYear.value
-  }
+window.addEventListener('load', displayAlbums)
 
-  const albumDataJSON = JSON.stringify(albumData)
-
-  let data = await addAlbum(albumDataJSON)
-  console.log(data)
-  if (data === 'Id already exist!' || data === 'Album already exist in database!') {
-    return
-  } else {
-    // Displays some information in a label
-    document.getElementById('albumInfo').innerHTML = data.title + ' added! Page reload commencing..'
-    setTimeout(() => { location.reload() }, 2000)     // Delay before page reload to update table
-  }
-})
-
-// Takes care of displaying all albums
+// Takes care of displaying all albums and their buttons
 async function displayAlbums() {
   let data = await getAlbums()
 
@@ -35,9 +15,9 @@ async function displayAlbums() {
     const row = document.createElement('tr')
 
     // Cell for album id
-    let idCell = document.createElement('td')
+    /*let idCell = document.createElement('td')
     idCell.textContent = album._id
-    row.appendChild(idCell)
+    row.appendChild(idCell)*/
 
     // Cell for album title
     let titleCell = document.createElement('td')
@@ -50,9 +30,9 @@ async function displayAlbums() {
     row.appendChild(artistCell)
 
     // Cell for album year
-    let yearCell = document.createElement('td')
+    /*let yearCell = document.createElement('td')
     yearCell.textContent = album.year
-    row.appendChild(yearCell)
+    row.appendChild(yearCell)*/
 
     // Cell for delete button
     let deleteButtonCell = document.createElement('td')
@@ -109,22 +89,27 @@ async function displayAlbums() {
 
     // Event listener for the update button
     updateButton.addEventListener('click', async () => {
+      // New 'submit' button
       let submitButton = document.createElement('button')
       submitButton.textContent = 'Submit'
 
+      // New 'cancel' button
       let cancelUpdateButton = document.createElement('button')
       cancelUpdateButton.textContent = 'Cancel'
 
+      // Field for entering new title
       let titleField = document.createElement('input')
       titleField.type = 'text'
       titleField.id = 'updateTitle'
       titleField.placeholder = 'Title'
 
+      // Field for entering new artist
       let artistField = document.createElement('input')
       artistField.type = 'text'
       artistField.id = 'updateArtist'
       artistField.placeholder = 'Artist'
 
+      // Field for entering new year
       let yearField = document.createElement('input')
       yearField.type = 'number'
       yearField.id = 'updateYear'
@@ -151,6 +136,7 @@ async function displayAlbums() {
         let data = await updateAlbum(albumDataJSON)
         console.log(data)
 
+        // Displays some information in a label
         document.getElementById('albumInfo').innerHTML = album.title + ' updated! Page reload commencing..'
         setTimeout(() => { location.reload() }, 2000)
       })
@@ -170,13 +156,63 @@ async function displayAlbums() {
     updateButtonCell.appendChild(updateButton)
     row.appendChild(updateButtonCell)
 
+    let detailsButtonCell = document.createElement('td')
+    let detailsButton = document.createElement('button')
+    detailsButton.textContent = 'Details'
+
+    detailsButton.addEventListener('click', async () => {
+      const albumTitle = album.title
+
+      let albumData = await getAlbumDetails(albumTitle)
+
+      // Disdplays the album details in a label
+      document.getElementById('albumInfo').innerHTML = JSON.stringify(albumData, null, 2)
+    })
+
+    detailsButtonCell.appendChild(detailsButton)
+    row.appendChild(detailsButtonCell)
+
     // Appends the row to the table
     tableBody.appendChild(row)
   })
 }
 
-window.addEventListener('load', displayAlbums)
+// Event listener for the add button
+addButton.addEventListener('click', async event => {
+  const albumData = {
+    id: addId.value,
+    title: addTitle.value,
+    artist: addArtist.value,
+    year: addYear.value
+  }
 
+  const albumDataJSON = JSON.stringify(albumData)
+
+  let data = await addAlbum(albumDataJSON)
+  console.log(data)
+  if (data === 'Id already exist!' || data === 'Album already exist in database!') {
+    return
+  } else {
+    // Displays some information in a label
+    document.getElementById('albumInfo').innerHTML = data.title + ' added! Page reload commencing..'
+    setTimeout(() => { location.reload() }, 2000)     // Delay before page reload to update table
+  }
+})
+
+async function getAlbumDetails(albumTitle) {
+  try {
+    let result = await fetch(`http://localhost:3000/api/albums/${albumTitle}`, {
+      method: 'GET',
+      headers: { 'content-type': 'application/json' }
+    })
+    let rest = await result.json()
+    return rest
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// Fetch for updating information of an album
 async function updateAlbum(albumData) {
   try {
     let result = await fetch('http://localhost:3000/api/albums/:id', {
