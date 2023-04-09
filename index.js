@@ -106,16 +106,34 @@ app.post('/api/albums', async function (req, res) {
 
 // Route for updating an album
 app.put('/api/albums/:id', async function (req, res) {
-  let id = req.body.id
-  let title = req.body.title
-  let artist = req.body.artist
-  let year = req.body.year
+  let updateFields = {}
 
-  AlbumModel.findByIdAndUpdate(ObjectId(id), {
-    title: `${title}`,
-    artist: `${artist}`,
-    year: `${year}`
-  })
+  let id = req.body.id
+  /*let title
+  let artist
+  let year
+  console.log(id)*/
+
+  if (req.body.title) {
+    updateFields.title = req.body.title
+    console.log('Title is title')
+  }
+  console.log(updateFields.title)
+
+  if (req.body.artist) {
+    updateFields.artist = req.body.artist
+    console.log('Artist is artist')
+  }
+  //console.log(updateFields.artist)
+
+  if (req.body.year) {
+    updateFields.year = req.body.year
+    console.log('Year is year')
+  }
+  //console.log(updateFields.year)
+
+  // Finds the album by id and tries to update it
+  AlbumModel.findByIdAndUpdate(id, updateFields, { new: true })
     .then((updatedAlbum) => {
       if (!updatedAlbum) {
         res.status(404).json('Album not found!')
@@ -131,6 +149,8 @@ app.put('/api/albums/:id', async function (req, res) {
 // Route for deleting an album
 app.delete('/api/albums/:id', async function (req, res) {
   let id = req.body.id
+
+  // Finds the album by id and tries to delete it
   AlbumModel.findByIdAndDelete(id)
     .then((deletedAlbum) => {
       if (!deletedAlbum) {

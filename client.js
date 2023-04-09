@@ -1,12 +1,13 @@
 const getAlbumsButton = document.getElementById('getAlbumsButton')
 const addButton = document.getElementById('addButton')
 
+// Event listener for the add button
 addButton.addEventListener('click', async event => {
   const albumData = {
-    id: id.value,
-    title: title.value,
-    artist: artist.value,
-    year: year.value
+    id: addId.value,
+    title: addTitle.value,
+    artist: addArtist.value,
+    year: addYear.value
   }
 
   const albumDataJSON = JSON.stringify(albumData)
@@ -16,9 +17,9 @@ addButton.addEventListener('click', async event => {
   if (data === 'Id already exist!' || data === 'Album already exist in database!') {
     return
   } else {
+    // Displays some information in a label
     document.getElementById('albumInfo').innerHTML = data.title + ' added! Page reload commencing..'
-
-    setTimeout(() => { location.reload() }, 2000)
+    setTimeout(() => { location.reload() }, 2000)     // Delay before page reload to update table
   }
 })
 
@@ -78,8 +79,9 @@ async function displayAlbums() {
         const albumIdJSON = JSON.stringify(albumId)
         let idData = await deleteAlbum(albumIdJSON)
 
+        // Disdplays some information in a label
         document.getElementById('albumInfo').innerHTML = idData.title + ' deleted! Page reload commencing..'
-        setTimeout(() => { location.reload() }, 2000)
+        setTimeout(() => { location.reload() }, 2000)     // Delay before page reload to update the table
       })
 
       let cancelDeleteButton = document.createElement('button')
@@ -89,7 +91,7 @@ async function displayAlbums() {
       deleteButtonCell.appendChild(cancelDeleteButton)
 
       // Event handler for canceling deletion
-      cancelDeleteButton.addEventListener('click', async () => {
+      cancelDeleteButton.addEventListener('click', () => {
         // Replaces confirm/cancel with the original delete button
         deleteButtonCell.removeChild(confirmDeleteButton)
         deleteButtonCell.removeChild(cancelDeleteButton)
@@ -104,16 +106,65 @@ async function displayAlbums() {
     let updateButtonCell = document.createElement('td')
     let updateButton = document.createElement('button')
     updateButton.textContent = 'Update'
+
+    // Event listener for the update button
     updateButton.addEventListener('click', async () => {
-      const albumData = {
-        id: album._id
-      }
+      let submitButton = document.createElement('button')
+      submitButton.textContent = 'Submit'
 
-      const albumDataJSON = JSON.stringify(albumData)
-      let data = await deleteAlbum(albumDataJSON)
+      let cancelUpdateButton = document.createElement('button')
+      cancelUpdateButton.textContent = 'Cancel'
 
-      document.getElementById('albumInfo').innerHTML = data.title + ' updated! Page reload commencing..'
-      setTimeout(() => { location.reload() }, 2000)
+      let titleField = document.createElement('input')
+      titleField.type = 'text'
+      titleField.id = 'updateTitle'
+      titleField.placeholder = 'Title'
+
+      let artistField = document.createElement('input')
+      artistField.type = 'text'
+      artistField.id = 'updateArtist'
+      artistField.placeholder = 'Artist'
+
+      let yearField = document.createElement('input')
+      yearField.type = 'number'
+      yearField.id = 'updateYear'
+      yearField.placeholder = 'Year'
+
+      // Removes update button and replaces it with submit/cancel and textboxes
+      updateButtonCell.removeChild(updateButton)
+      updateButtonCell.appendChild(titleField)
+      updateButtonCell.appendChild(artistField)
+      updateButtonCell.appendChild(yearField)
+      updateButtonCell.appendChild(submitButton)
+      updateButtonCell.appendChild(cancelUpdateButton)
+
+      // Event listener for submit button
+      submitButton.addEventListener('click', async () => {
+        const albumData = {
+          id: album._id,
+          title: updateTitle.value,
+          artist: updateArtist.value,
+          year: updateYear.value
+        }
+
+        const albumDataJSON = JSON.stringify(albumData)
+        let data = await updateAlbum(albumDataJSON)
+        console.log(data)
+
+        document.getElementById('albumInfo').innerHTML = album.title + ' updated! Page reload commencing..'
+        setTimeout(() => { location.reload() }, 2000)
+      })
+
+      // Event listener for cancel button
+      cancelUpdateButton.addEventListener('click', () => {
+        // Replaces submit/cancel buttons with the original update button
+        updateButtonCell.removeChild(submitButton)
+        updateButtonCell.removeChild(cancelUpdateButton)
+        updateButtonCell.removeChild(titleField)
+        updateButtonCell.removeChild(artistField)
+        updateButtonCell.removeChild(yearField)
+        updateButtonCell.appendChild(updateButton)
+      })
     })
 
     updateButtonCell.appendChild(updateButton)
@@ -125,6 +176,20 @@ async function displayAlbums() {
 }
 
 window.addEventListener('load', displayAlbums)
+
+async function updateAlbum(albumData) {
+  try {
+    let result = await fetch('http://localhost:3000/api/albums/:id', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: albumData
+    })
+    let rest = await result.json()
+    return rest
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 // Fetch for deleting an album
 async function deleteAlbum(albumData) {
