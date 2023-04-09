@@ -47,15 +47,12 @@ app.get('/api/albums', async function (req, res) {
 
 // Route for getting and displaying a specific album
 app.get('/api/albums/:title', async function (req, res) {
-  console.log('It call')
   let title = req.params.title
   // Gets an album using title
   let album = await AlbumModel.find({ title: `${title}` })
-  console.log(album)
 
   // If album title isn't found, send error status
   if (album != '') {
-    console.log(album)
     res.send(album)
   } else {
     res.status(404).json('Album not found')
