@@ -15,7 +15,7 @@ async function displayAlbums() {
   data.forEach(album => {
     const row = document.createElement('tr')
 
-    // Cell for album id
+    // Cell for album id, uncomment if you want this visible in the table
     /*let idCell = document.createElement('td')
     idCell.textContent = album._id
     row.appendChild(idCell)*/
@@ -30,7 +30,7 @@ async function displayAlbums() {
     artistCell.textContent = album.artist
     row.appendChild(artistCell)
 
-    // Cell for album year
+    // Cell for album year, uncomment if you want this visible in the table
     /*let yearCell = document.createElement('td')
     yearCell.textContent = album.year
     row.appendChild(yearCell)*/
