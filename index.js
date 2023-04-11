@@ -6,7 +6,6 @@ require('dotenv').config()
 
 const port = process.env.PORT
 
-app.set('view engine', 'ejs')
 app.use(express.json())
 app.use(cors({
   origin: "*",
@@ -107,7 +106,7 @@ app.post('/api/albums', async function (req, res) {
 app.put('/api/albums/:id', async function (req, res) {
   let updateFields = {}
 
-  let id = req.body.id
+  let id = req.params.id
 
   // Values of a document will only be changed if a new value was entered when updating
   // If no new value was entered, that value will remain empty here and be ignored when updating
@@ -139,7 +138,7 @@ app.put('/api/albums/:id', async function (req, res) {
 
 // Route for deleting an album
 app.delete('/api/albums/:id', async function (req, res) {
-  let id = req.body.id
+  let id = req.params.id
 
   // Finds the album by id and tries to delete it
   AlbumModel.findByIdAndDelete(id)

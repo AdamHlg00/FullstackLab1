@@ -1,6 +1,7 @@
 const getAlbumsButton = document.getElementById('getAlbumsButton')
 const addButton = document.getElementById('addButton')
 
+// The displayAlbums() function will run as soon as the window is loaded
 window.addEventListener('load', displayAlbums)
 
 // Takes care of displaying all albums and their buttons
@@ -52,12 +53,10 @@ async function displayAlbums() {
 
       // Event handler for confirming deletion
       confirmDeleteButton.addEventListener('click', async () => {
-        const albumId = {
-          id: album._id
-        }
+        const albumId = album._id
 
-        const albumIdJSON = JSON.stringify(albumId)
-        let idData = await deleteAlbum(albumIdJSON)
+        //const albumIdJSON = JSON.stringify(albumId)
+        let idData = await deleteAlbum(albumId)
 
         // Disdplays some information in a label
         document.getElementById('albumInfo').innerHTML = idData.title + ' deleted! Page reload commencing..'
@@ -125,15 +124,15 @@ async function displayAlbums() {
 
       // Event listener for submit button
       submitButton.addEventListener('click', async () => {
+        const albumId = album._id
         const albumData = {
-          id: album._id,
           title: updateTitle.value,
           artist: updateArtist.value,
           year: updateYear.value
         }
 
         const albumDataJSON = JSON.stringify(albumData)
-        let data = await updateAlbum(albumDataJSON)
+        let data = await updateAlbum(albumDataJSON, albumId)
         console.log(data)
 
         // Displays some information in a label
@@ -156,16 +155,18 @@ async function displayAlbums() {
     updateButtonCell.appendChild(updateButton)
     row.appendChild(updateButtonCell)
 
+    // Creates the ditails button
     let detailsButtonCell = document.createElement('td')
     let detailsButton = document.createElement('button')
     detailsButton.textContent = 'Details'
 
+    // Event listener for details button
     detailsButton.addEventListener('click', async () => {
       const albumTitle = album.title
 
       let albumData = await getAlbumDetails(albumTitle)
 
-      // Disdplays the album details in a label
+      // Displays the album details in a label
       document.getElementById('albumInfo').innerHTML = JSON.stringify(albumData, null, 2)
     })
 
@@ -199,6 +200,7 @@ addButton.addEventListener('click', async event => {
   }
 })
 
+// Fetch for getting details about a specific album
 async function getAlbumDetails(albumTitle) {
   try {
     let result = await fetch(`http://localhost:3000/api/albums/${albumTitle}`, {
@@ -213,9 +215,9 @@ async function getAlbumDetails(albumTitle) {
 }
 
 // Fetch for updating information of an album
-async function updateAlbum(albumData) {
+async function updateAlbum(albumData, albumId) {
   try {
-    let result = await fetch('http://localhost:3000/api/albums/:id', {
+    let result = await fetch(`http://localhost:3000/api/albums/${albumId}`, {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
       body: albumData
@@ -230,10 +232,9 @@ async function updateAlbum(albumData) {
 // Fetch for deleting an album
 async function deleteAlbum(albumData) {
   try {
-    let result = await fetch('http://localhost:3000/api/albums/:id', {
+    let result = await fetch(`http://localhost:3000/api/albums/${albumData}`, {
       method: 'DELETE',
-      headers: { 'content-type': 'application/json' },
-      body: albumData
+      headers: { 'content-type': 'application/json' }
     })
     let rest = await result.json()
     return rest
